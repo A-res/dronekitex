@@ -1,30 +1,5 @@
-import asyncio
-from mavsdk import System
-
-
-async def run():
-
-    drone = System()
-    await drone.connect(system_address="udp://:14540")
-
-    print("Waiting for drone to connect...")
-    async for state in drone.core.connection_state():
-        if state.is_connected:
-            print(f"Drone discovered with UUID: {state.uuid}")
-            break
-
-    print("Waiting for drone to have a global position estimate...")
-    async for health in drone.telemetry.health():
-        if health.is_global_position_ok:
-            print("Global position estimate ok")
-            break
-
-    print("-- Arming")
-    await drone.action.arm()
-
-    print("-- Taking off")
-    await drone.action.takeoff()
-    
+#import asyncio
+#from mavsdk import System   
 import time
 from threading import Thread
 from PyQt5.QtWidgets import QApplication, QMainWindow, QLCDNumber, QLineEdit, QGroupBox, QPushButton, QHBoxLayout, QVBoxLayout, QProgressBar, QLabel, QAction 
@@ -36,7 +11,6 @@ connection_string       = 'udpin:127.0.0.1:14550'
 import design
 from dronekit import connect, VehicleMode 
 #import main2
-
 print("Connection to vehicle", connection_string)
 vehicle = connect(connection_string, wait_ready=True)
 print(vehicle.rangefinder)
@@ -66,35 +40,35 @@ class Window(QMainWindow, design.Ui_aBPLA):
         self.progressBar.resize(400,30)
         
         self.finishbutton = QPushButton(self)
-        self.finishbutton.clicked.connect(self.my_func2)
+      #  self.finishbutton.clicked.connect(self.my_func2)
         self.finishbutton.clicked.connect(self.threadstart)
         self.finishbutton.move(160, 520)
         self.finishbutton.setText('Прекратить симуляцию')
         self.finishbutton.resize(200,50)
         
         self.takeoffbutton = QPushButton(self)
-        self.takeoffbutton.clicked.connect(self.my_func)
-        self.takeoffbutton.clicked.connect(self.threadstart)
+   #     self.takeoffbutton.clicked.connect(self.my_func2)
+      #  self.takeoffbutton.clicked.connect(self.threadstart)
         self.takeoffbutton.move(20, 160)
         self.takeoffbutton.setText('takeoffbutton')
         
         self.takeoffbutton.resize(200,50)
        
         self.decor = QGroupBox(self)
-        self.decor.move(0,240)
-        self.decor.resize(240, 90)
+        self.decor.move(130,240)
+        self.decor.resize(260, 90)
         
         print(vehicle.location.global_relative_frame)
         print(vehicle.location.global_frame)
         
         #print(k)
         self.location = QLabel(self)
-        self.location.move(0, 260)
+        self.location.move(150, 260)
         #self.location.setText(k)
         self.location.resize(800, 20)    
         
         self.head = QLabel(self)
-        self.head.move(1, 350)
+        self.head.move(130, 350)
         self.location.resize(800, 60)         
          
         self.landbutton = QPushButton(self)
@@ -147,11 +121,9 @@ class Window(QMainWindow, design.Ui_aBPLA):
         self.startbutton.move(2222,2222)
         #print(self.startbutton.isEnabled)
         
-        
-    def my_func2(self):
-        self.startbutton.move(370, 520)
-        self.finishbutton.isVisible = False
-        
+     
+       
+            
 
     def _countdown(self):
          
@@ -163,6 +135,8 @@ class Window(QMainWindow, design.Ui_aBPLA):
              h=str(vehicle._heading)
              x = vehicle._groundspeed
              y = vehicle._yawspeed
+             vehicle.arm(self)
+             vehicle.simple_takeoff(1115)
             # 
              self.location.setText("north = " + north + "\n" + "east = " + east + "\n" + "down = " + down)
              self.head.setText("heading = " + h + "°")
